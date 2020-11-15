@@ -11,7 +11,7 @@ namespace BookStore.Models.Repo
         TEntity find(int id);
         void add(TEntity entity);
 
-        void update(TEntity entity);
+        void update(int id,TEntity entity);
 
         void delete(int id);
 
