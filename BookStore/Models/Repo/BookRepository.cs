@@ -5,10 +5,10 @@ using System.Threading.Tasks;
 
 namespace BookStore.Models.Repo
 {
-    public class BookRepository : IBookStoreRepository<Book>
+    public class BookRepossitory : IBookStoreRepository<Book>
     {
         List<Book> books;
-        public BookRepository()
+        public BookRepossitory()
         {
             books = new List<Book>()
                 {
