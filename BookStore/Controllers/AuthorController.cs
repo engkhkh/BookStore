@@ -28,7 +28,8 @@ namespace BookStore.Controllers
         // GET: Author/Details/5
         public ActionResult Details(int id)
         {
-            return View();
+            var Author = authorRespo.find(id);
+            return View(Author);
         }
 
         // GET: Author/Create
@@ -40,11 +41,12 @@ namespace BookStore.Controllers
         // POST: Author/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
+        public ActionResult Create(Author author)
         {
             try
             {
                 // TODO: Add insert logic here
+                authorRespo.add(author);
 
                 return RedirectToAction(nameof(Index));
             }
