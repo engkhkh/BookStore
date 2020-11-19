@@ -59,17 +59,19 @@ namespace BookStore.Controllers
         // GET: Author/Edit/5
         public ActionResult Edit(int id)
         {
-            return View();
+            var Author = authorRespo.find(id);
+            return View(Author);
         }
 
         // POST: Author/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
+        public ActionResult Edit(int id, Author author)
         {
             try
             {
                 // TODO: Add update logic here
+                authorRespo.update(id, author);
 
                 return RedirectToAction(nameof(Index));
             }
@@ -82,17 +84,20 @@ namespace BookStore.Controllers
         // GET: Author/Delete/5
         public ActionResult Delete(int id)
         {
-            return View();
+           var author= authorRespo.find(id);
+            return View(author);
         }
 
         // POST: Author/Delete/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
+        public ActionResult Delete(int id, Author author)
         {
             try
             {
                 // TODO: Add delete logic here
+                authorRespo.delete(id);
+
 
                 return RedirectToAction(nameof(Index));
             }
