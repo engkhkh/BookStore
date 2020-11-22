@@ -76,21 +76,36 @@ namespace BookStore.Controllers
         public ActionResult Edit(int id)
         {
             var book = bookRespo.find(id);
+            var authorid = book.Author == null ? book.Author.Id = 0 :  book.Author.Id;
             var viewmodel = new BookAuthorViewModels
             {
-
+                BookId=book.Id,
+                Title=book.Title,
+                Description=book.Description,
+                AuthorId= authorid,
+                Authors=authorRepos.list().ToList()
             };
-            return View();
+            return View(viewmodel);
         }
 
         // POST: Book/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
+        public ActionResult Edit(int id, BookAuthorViewModels viewmodel)
         {
             try
             {
                 // TODO: Add update logic here
+                var author = authorRepos.find(viewmodel.AuthorId);
+                Book book = new Book
+                {
+                  // Id = viewmodel.BookId,
+                    Title = viewmodel.Title,
+                    Description = viewmodel.Description,
+                    Author = author
+
+                };
+                bookRespo.update(viewmodel.BookId, book);
 
                 return RedirectToAction(nameof(Index));
             }

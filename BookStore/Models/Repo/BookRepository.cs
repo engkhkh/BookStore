@@ -14,15 +14,15 @@ namespace BookStore.Models.Repo
                 {
                     new Book
                     {
-                        Id=1, Title="c#Book",Description="about c#"
+                        Id=1, Title="c#Book",Description="about c#",Author=new Author{Id=2}
                     },
                     new Book
                     {
-                        Id=2, Title="JavaBook",Description="about java"
+                        Id=2, Title="JavaBook",Description="about java",Author=new Author()
                     },
                     new Book
                     {
-                        Id=3, Title="asp.net Book",Description="about asp.net "
+                        Id=3, Title="asp.net Book",Description="about asp.net ",Author=new Author()
                     },
 
                 };
@@ -53,7 +53,7 @@ namespace BookStore.Models.Repo
         {
             var book = find(id);
             book.Title = newbook.Title;
-            book.Title = newbook.Description;
+            book.Description = newbook.Description;
             book.Author = newbook.Author;
         }
     }
