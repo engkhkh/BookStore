@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using BookStore.Models;
 using BookStore.Models.Repo;
 using BookStore.ViewModels;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -15,11 +17,14 @@ namespace BookStore.Controllers
         private readonly IBookStoreRepository<Book> bookRespo;
 
         public IBookStoreRepository<Author> authorRepos { get; }
+        public IHostingEnvironment hosting { get; }
 
-        public BookController(IBookStoreRepository<Book> BookRepossitory, IBookStoreRepository<Author> AuthorRepos)
+        public BookController(IBookStoreRepository<Book> BookRepossitory, IBookStoreRepository<Author> AuthorRepos
+            , IHostingEnvironment Hosting)
         {
             bookRespo = BookRepossitory;
             authorRepos = AuthorRepos;
+            hosting = Hosting;
         }
         // GET: Book
         public ActionResult Index()
@@ -41,7 +46,7 @@ namespace BookStore.Controllers
         {
             var model = new BookAuthorViewModels
             {
-                Authors = authorRepos.list().ToList()
+                Authors = fillselectlist()
             };
             return View(model);
         }
@@ -51,25 +56,45 @@ namespace BookStore.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Create(BookAuthorViewModels model)
         {
-            try
+            if (ModelState.IsValid)
             {
-                // TODO: Add insert logic here
-                var author = authorRepos.find(model.AuthorId);
-                Book book = new Book
+                try
                 {
-                    Id=model.BookId,
-                    Title=model.Title,
-                    Description=model.Description,
-                    Author=author
+                    // TODO: Add insert logic here
+                    string filename = string.Empty;
+                    if (model.file != null)
+                    {
+                        string uploads = Path.Combine(hosting.WebRootPath,"uploads");
+                        filename = model.file.FileName;
+                        string fullpath = Path.Combine(uploads, filename);
+                        model.file.CopyTo(new FileStream(fullpath, FileMode.Create));
+                    }
+                    if (model.AuthorId == -1)
+                    {
+                        ViewBag.message = "Please Select Author From List";
+                       
+                        return View(getallauthors());
+                    }
+                    var author = authorRepos.find(model.AuthorId);
+                    Book book = new Book
+                    {
+                        Id = model.BookId,
+                        Title = model.Title,
+                        Description = model.Description,
+                        Author = author,
+                        imageurl=filename
 
-                };
-                bookRespo.add(book);
-                return RedirectToAction(nameof(Index));
+                    };
+                    bookRespo.add(book);
+                    return RedirectToAction(nameof(Index));
+                }
+                catch
+                {
+                    return View();
+                }
             }
-            catch
-            {
-                return View();
-            }
+            ModelState.AddModelError("", "..you have to fill all required fields..");
+            return View(getallauthors());
         }
 
         // GET: Book/Edit/5
@@ -118,17 +143,19 @@ namespace BookStore.Controllers
         // GET: Book/Delete/5
         public ActionResult Delete(int id)
         {
-            return View();
+            var book = bookRespo.find(id);
+            return View(book);
         }
 
         // POST: Book/Delete/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
+        public ActionResult ConfirmDelete(int id)
         {
             try
             {
                 // TODO: Add delete logic here
+                bookRespo.delete(id);
 
                 return RedirectToAction(nameof(Index));
             }
@@ -136,6 +163,20 @@ namespace BookStore.Controllers
             {
                 return View();
             }
+        }
+        List<Author> fillselectlist()
+        {
+            var authors = authorRepos.list().ToList();
+            authors.Insert(0, new Author { Id = -1, Name = "--Please Select Item" });
+            return authors;
+        }
+        public BookAuthorViewModels getallauthors()
+        {
+            var vmodel = new BookAuthorViewModels
+            {
+                Authors = fillselectlist()
+            };
+            return vmodel;
         }
     }
 }

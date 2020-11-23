@@ -34,6 +34,20 @@
         <dd class="col-sm-10">
             @Html.DisplayFor(model => model.Author.Name)
         </dd>
+        @if (Model.imageurl != null)
+        {
+            <dt>
+                Image:
+            </dt>
+            <dd>
+
+
+
+                <img src="~/uploads/@Model.imageurl" class="img-thumbnail" style="width:120px; " />
+
+
+            </dd>
+        }
     </dl>
 </div>
 <div>
