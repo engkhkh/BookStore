@@ -22,6 +22,6 @@ namespace BookStore.ViewModels
 
         public List<Author> Authors { get; set; }
         public IFormFile  file { get; set; }
-
+        public string imageurl { get; set; }
     }
 }

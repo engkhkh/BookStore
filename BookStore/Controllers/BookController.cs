@@ -108,7 +108,8 @@ namespace BookStore.Controllers
                 Title=book.Title,
                 Description=book.Description,
                 AuthorId= authorid,
-                Authors=authorRepos.list().ToList()
+                Authors=authorRepos.list().ToList(),
+                imageurl=book.imageurl
             };
             return View(viewmodel);
         }
@@ -121,13 +122,31 @@ namespace BookStore.Controllers
             try
             {
                 // TODO: Add update logic here
+                string filename = string.Empty;
+                if (viewmodel.file != null)
+                {
+                    string uploads = Path.Combine(hosting.WebRootPath, "uploads");
+                    filename = viewmodel.file.FileName;
+                    string fullpath = Path.Combine(uploads, filename);
+                    // delete old file 
+                    string oldfilename = bookRespo.find(viewmodel.BookId).imageurl;
+                    string fulloldpath = Path.Combine(uploads,oldfilename);
+                    if (fullpath != fulloldpath)
+                    {
+                        System.IO.File.Delete(fulloldpath);
+
+                        //save new  file 
+                        viewmodel.file.CopyTo(new FileStream(fullpath, FileMode.Create));
+                    }
+                }
                 var author = authorRepos.find(viewmodel.AuthorId);
                 Book book = new Book
                 {
                   // Id = viewmodel.BookId,
                     Title = viewmodel.Title,
                     Description = viewmodel.Description,
-                    Author = author
+                    Author = author,
+                    imageurl=filename
 
                 };
                 bookRespo.update(viewmodel.BookId, book);

@@ -11,7 +11,7 @@
 <hr />
 <div class="row">
     <div class="col-md-4">
-        <form asp-action="Edit">
+        <form asp-action="Edit" enctype="multipart/form-data">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
                 <label asp-for="BookId" class="control-label"></label>
@@ -29,6 +29,12 @@
                 <span asp-validation-for="Description" class="text-danger"></span>
             </div>
             <div class="form-group">
+                <label asp-for="file" class="control-label"></label>
+                <input type="file" name="file" asp-for="file" class="form-control" />
+                <span asp-validation-for="file" class="text-danger"></span>
+                <img src="~/uploads/@Model.imageurl" class="img-thumbnail" style="width:124px;" />
+            </div>
+            <div class="form-group">
                 <label asp-for="AuthorId" class="control-label"></label>
                 <select asp-for="AuthorId" class="form-control" asp-items="@(new SelectList(Model.Authors,"Id","Name"))"></select>
                 <span asp-validation-for="AuthorId" class="text-danger"></span>
@@ -42,9 +48,9 @@
 </div>
 
 <div>
-    
+
 </div>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <partial name="validate" />
 }
