@@ -50,6 +50,11 @@ namespace BookStore.Models.Repo
             return books;
         }
 
+        public List<Book> search(string term)
+        {
+            return books.Where(a => a.Title.Contains(term)).ToList();
+        }
+
         public void update(int id,Book newbook)
         {
             var book = find(id);

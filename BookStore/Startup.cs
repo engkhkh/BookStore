@@ -37,7 +37,10 @@ namespace BookStore
             services.AddDbContext<BookStoreDbContext>( Options =>
            {
                Options.UseSqlServer(Configuration.GetConnectionString("sqlcon"));
-           }
+
+         
+        }
+          
            );
 
         }

@@ -61,14 +61,8 @@ namespace BookStore.Controllers
                 try
                 {
                     // TODO: Add insert logic here
-                    string filename = string.Empty;
-                    if (model.file != null)
-                    {
-                        string uploads = Path.Combine(hosting.WebRootPath,"uploads");
-                        filename = model.file.FileName;
-                        string fullpath = Path.Combine(uploads, filename);
-                        model.file.CopyTo(new FileStream(fullpath, FileMode.Create));
-                    }
+                    string filename = uploadfile(model.file)??string.Empty;
+                    
                     if (model.AuthorId == -1)
                     {
                         ViewBag.message = "Please Select Author From List";
@@ -97,6 +91,41 @@ namespace BookStore.Controllers
             return View(getallauthors());
         }
 
+        private string uploadfile(IFormFile file)
+        {
+            if (file != null)
+            {
+                string uploads = Path.Combine(hosting.WebRootPath, "uploads");
+               
+                string fullpath = Path.Combine(uploads, file.FileName);
+                file.CopyTo(new FileStream(fullpath, FileMode.Create));
+                return file.FileName;
+            }
+            return null;
+        }
+        private string uploadfile(IFormFile file,string imageurl)
+        {
+            if (file != null)
+            {
+                string uploads = Path.Combine(hosting.WebRootPath, "uploads");
+                
+                string newpath = Path.Combine(uploads, file.FileName);
+                // delete old file 
+              
+                string oldpath = Path.Combine(uploads, imageurl);
+                if (oldpath != newpath)
+                {
+                    System.IO.File.Delete(oldpath);
+
+                    //save new  file 
+                    file.CopyTo(new FileStream(newpath, FileMode.Create));
+
+                }
+                return file.FileName;
+            }
+            return imageurl;
+        }
+
         // GET: Book/Edit/5
         public ActionResult Edit(int id)
         {
@@ -122,27 +151,12 @@ namespace BookStore.Controllers
             try
             {
                 // TODO: Add update logic here
-                string filename = string.Empty;
-                if (viewmodel.file != null)
-                {
-                    string uploads = Path.Combine(hosting.WebRootPath, "uploads");
-                    filename = viewmodel.file.FileName;
-                    string fullpath = Path.Combine(uploads, filename);
-                    // delete old file 
-                    string oldfilename = bookRespo.find(viewmodel.BookId).imageurl;
-                    string fulloldpath = Path.Combine(uploads,oldfilename);
-                    if (fullpath != fulloldpath)
-                    {
-                        System.IO.File.Delete(fulloldpath);
-
-                        //save new  file 
-                        viewmodel.file.CopyTo(new FileStream(fullpath, FileMode.Create));
-                    }
-                }
+                string filename = uploadfile(viewmodel.file,viewmodel.imageurl);
+               
                 var author = authorRepos.find(viewmodel.AuthorId);
                 Book book = new Book
                 {
-                  // Id = viewmodel.BookId,
+                   Id = viewmodel.BookId,
                     Title = viewmodel.Title,
                     Description = viewmodel.Description,
                     Author = author,
@@ -196,6 +210,11 @@ namespace BookStore.Controllers
                 Authors = fillselectlist()
             };
             return vmodel;
+        }
+        public ActionResult search(string term)
+        {
+            var result = bookRespo.search(term);
+            return View ("Index", result);
         }
     }
 }

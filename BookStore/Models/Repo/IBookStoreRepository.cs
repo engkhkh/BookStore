@@ -14,6 +14,7 @@ namespace BookStore.Models.Repo
         void update(int id,TEntity entity);
 
         void delete(int id);
+        public List<TEntity> search(string term);
 
     }
 }
